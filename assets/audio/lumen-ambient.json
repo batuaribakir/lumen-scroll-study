@@ -1,0 +1,23 @@
+{
+  "title": "lumen ambient (study loop)",
+  "generator": "tools/lumen/make-track.py",
+  "seed": 2026,
+  "durationS": 144.0,
+  "sampleRate": 44100,
+  "channels": 2,
+  "bitrateKbps": 112,
+  "bytes": 2016548,
+  "rmsDbfs": -18.19,
+  "peakDbfs": -5.07,
+  "chords": [
+    "Dm9",
+    "Bbmaj7",
+    "Gm9",
+    "Asus4",
+    "Fmaj7",
+    "Cadd9",
+    "Bbmaj9",
+    "Asus2"
+  ],
+  "provenance": "Original work synthesised by this script (no samples, recordings or existing melodies). Licence: to be chosen by the repository owner."
+}

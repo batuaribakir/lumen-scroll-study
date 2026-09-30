@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>lumen — scroll narrative study</title>
+  <meta name="description" content="A study reconstruction of a scroll-driven narrative page, with original placeholder content." />
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#031011" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500;700;900&display=swap" />
+  <link rel="stylesheet" href="./styles.css" />
+  <script type="module" src="./src/main.js"></script>
+</head>
+<body>
+  <div id="root">
+    <div id="runway">
+      <div id="viewport">
+        <div id="stage">
+          <canvas id="dots" aria-hidden="true"></canvas>
+          <div id="chartLabels" aria-hidden="true"></div>
+          <div class="market-label" aria-hidden="true"></div>
+          <div id="opsLabels" aria-hidden="true"></div>
+          <div class="vignette" aria-hidden="true"></div>
+          <div id="progress" aria-hidden="true"></div>
+          <div class="brand" aria-label="lumen"></div>
+          <audio id="bgm" preload="none" loop></audio>
+          <button id="bgmBtn" class="pending" type="button" aria-label="Background music" aria-pressed="false"></button>
+          <!-- section.beat × 15 are inserted here by src/dom.js -->
+          <div id="backedStrip" class="backed"></div>
+          <div id="hint" aria-hidden="true"></div>
+          <button id="docsToggle" type="button" aria-expanded="false" aria-controls="docsPanel"></button>
+          <aside id="docsPanel" aria-hidden="true"></aside>
+          <div id="leadSheet" role="dialog" aria-modal="true" aria-labelledby="leadTitle" aria-hidden="true"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <noscript><p style="padding:24px;color:#f4efe6;font-family:sans-serif">This study page needs JavaScript.</p></noscript>
+</body>
+</html>
