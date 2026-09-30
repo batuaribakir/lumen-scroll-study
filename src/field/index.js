@@ -46,6 +46,7 @@ export function createField(canvas, opts = {}) {
   const {
     config, chart, reducedMotion = false, touch = false, random = Math.random,
     palette = () => DEFAULT_PALETTE, circuitSeed = DEFAULT_CIRCUIT_SEED,
+    ladderRecovery = true,   // false: strict reference behaviour (the ladder never steps back up)
   } = opts;
   if (!config || !chart) throw new Error('createField: config and chart are required');
   const ctx = canvas.getContext('2d');
@@ -77,7 +78,8 @@ export function createField(canvas, opts = {}) {
   };
 
   // ---- runtime state ------------------------------------------------------------------
-  const ladder = createLadder();
+  const ladder = createLadder({ recover: ladderRecovery });
+  let targetE = 0;           // the resolution factor resize() asks for; recovery climbs back to it
   let E = E_MIN, stageScale = 1;
   let G = 0, last = typeof performance !== 'undefined' ? performance.now() : 0, first = true;
   let lastKey = null, lastMoving = true, destroyed = false;
@@ -102,6 +104,7 @@ export function createField(canvas, opts = {}) {
     stageScale = s > 0 ? s : 1;
     const ceilU = Math.min(1, Math.sqrt(REF_AREA / (W * H)));
     const want = Math.max(E_MIN, Math.min(ceilU, Math.round(stageScale * dpr * 4) / 4));
+    targetE = Math.max(targetE, want);
     E = Math.min(ladder.kCeil, Math.max(E, want));
     applyBacking();
   }
@@ -220,11 +223,15 @@ export function createField(canvas, opts = {}) {
     const dtMs = now - last;
     last = now;
     const dt = Math.min(0.05, Math.max(0, dtMs / 1000));
-    if (!first && dtMs > 0 && ladder.sample(dtMs, now) && E > ladder.kCeil) { E = ladder.kCeil; applyBacking(); }
     if (!reduced) G += dt;
     const Lc = clamp01(Number.isFinite(L) ? L : 0);
     const w = weights(Lc, reduced);
     lastW = w;
+    // quality: the line scene and the dot scenes keep separate levels (quality.js)
+    const classChanged = ladder.setClass(w.Ht > 0.01 ? 'travel' : 'light');
+    const step = !first && dtMs > 0 ? ladder.sample(dtMs, now) : 0;
+    const wantE = Math.min(ladder.kCeil, Math.max(targetE, E_MIN));
+    if ((step < 0 && E > ladder.kCeil) || ((step > 0 || classChanged) && wantE !== E)) { E = wantE; applyBacking(); }
     stats.frames++;
 
     const key = stateKey(w);
@@ -273,7 +280,7 @@ export function createField(canvas, opts = {}) {
     /** Read-only view of the internals for tests and the dev page. */
     debug: {
       get E() { return E; }, get stageScale() { return stageScale; }, get G() { return G; },
-      get quality() { return { kCeil: ladder.kCeil, detail: ladder.detail, dotK: ladder.dotK, steps: ladder.steps }; },
+      get quality() { return { kCeil: ladder.kCeil, detail: ladder.detail, dotK: ladder.dotK, steps: ladder.steps, recoveries: ladder.recoveries, sceneClass: ladder.sceneClass, E }; },
       get weights() { return lastW; }, get stats() { return { ...stats }; },
       get cursor() { return { ...cursor }; },
       counts: { total, ambient, scale, chart: chartPts.length, road: roadSample.points.length, fall: fallSample.points.length, circuit: circPts.length, segs: tree.segs.length, pads: tree.pads.length },

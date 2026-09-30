@@ -14,6 +14,8 @@ import { setupMusic, setupDisciplines, setupDocs, setupLead } from './ui.js';
 
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = matchMedia('(any-hover: hover) and (any-pointer: fine)').matches;
+// ?strict-ladder restores the reference's never-recovering quality ladder (for comparisons).
+const strictLadder = new URLSearchParams(location.search).has('strict-ladder');
 
 const stage = document.getElementById('stage');
 const canvas = document.getElementById('dots');
@@ -48,7 +50,7 @@ function mount() {
     onDisciplineScroll: k => disciplines.select(k),
   });
   field?.destroy();
-  field = createField ? createField(canvas, { config: cfg, chart: CHART, reducedMotion, touch: !finePointer, random: Math.random, palette: readPalette }) : null;
+  field = createField ? createField(canvas, { config: cfg, chart: CHART, reducedMotion, touch: !finePointer, random: Math.random, palette: readPalette, ladderRecovery: !strictLadder }) : null;
   field?.resize(scale, window.devicePixelRatio || 1);
   requestAnimationFrame(() => { maxScroll = document.documentElement.scrollHeight - vp.h; readTarget(); });
   maxScroll = document.documentElement.scrollHeight - vp.h;
@@ -101,4 +103,4 @@ function frame(now) {
 requestAnimationFrame(frame);
 
 // Test hook for the audit harness (reads only).
-window.__lumen = { get L() { return L; }, get target() { return target; }, get config() { return cfg; } };
+window.__lumen = { get L() { return L; }, get target() { return target; }, get config() { return cfg; }, get quality() { return field?.debug?.quality ?? null; } };
